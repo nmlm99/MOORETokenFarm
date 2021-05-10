@@ -1,9 +1,8 @@
-// SPDX-License-Identifier: MIT
-pragma solidity >=0.5.0;
+pragma solidity ^0.5.0;
 
-contract DappToken {
-    string  public name = "DApp Token";
-    string  public symbol = "DAPP";
+contract Token {
+    string  public name = "MOORE Token";
+    string  public symbol = "MOORE";
     uint256 public totalSupply = 1000000000000000000000000; // 1 million tokens
     uint8   public decimals = 18;
 

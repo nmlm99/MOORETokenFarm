@@ -5,16 +5,16 @@ import Main from './Main';
 import './App.css'
 
 import DaiToken from '../abis/DaiToken.json';
-import DappToken from '../abis/DappToken.json';
+import MOOREToken from '../abis/MOOREToken.json';
 import TokenFarm from '../abis/TokenFarm.json';
 
 function App() {
   const [account, setAccount] = useState('');
   const [daiToken, setDaiToken] = useState({});
-  const [dappToken, setDappToken] = useState({});
+  const [MOOREToken, setMOOREToken] = useState({});
   const [tokenFarm, setTokenFarm] = useState({});
   const [daiTokenBalance, setDaiTokenBalance] = useState('0');
-  const [dappTokenBalance, setDappTokenBalance] = useState('0');
+  const [MOORETokenBalance, setMOORETokenBalance] = useState('0');
   const [stakingBalance, setStakingBalance] = useState('0');
   const [loading, setLoading] = useState(true);
 
@@ -48,15 +48,15 @@ function App() {
       window.alert('DaiToken contract not deployed to detected network')
     }
     
-    //Load DappToken
-    const dappTokenData = DappToken.networks[networkId];
-    if (dappTokenData) {
-      const dappToken = new web3.eth.Contract(DappToken.abi, dappTokenData.address)
-      setDappToken(dappToken);
-      let dappTokenBalance = await dappToken.methods.balanceOf(userAccount).call()
-      setDappTokenBalance(dappTokenBalance.toString())
+    //Load MOOREToken
+    const MOORETokenData = MOOREToken.networks[networkId];
+    if (MOORETokenData) {
+      const MOOREToken = new web3.eth.Contract(MOOREToken.abi, MOORETokenData.address)
+      setMOOREToken(MOOREToken);
+      let MOORETokenBalance = await MOOREToken.methods.balanceOf(userAccount).call()
+      setMOORETokenBalance(MOORETokenBalance.toString())
     } else {
-      window.alert('DappToken contract not deployed to detected network')
+      window.alert('MOOREToken contract not deployed to detected network')
     }
     
     //Load TokenFarm
@@ -98,7 +98,7 @@ function App() {
   content = <p id="loader" className="text-center">Loading...</p> : 
   content = <Main 
     daiTokenBalance={daiTokenBalance}
-    dappTokenBalance={dappTokenBalance}
+    MOORETokenBalance={MOORETokenBalance}
     stakingBalance={stakingBalance}
     stakeTokens={stakeTokens}
     unstakeTokens={unstakeTokens}

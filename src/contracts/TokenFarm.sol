@@ -1,80 +1,75 @@
-// SPDX-License-Identifier: MIT
-pragma solidity >=0.5.0;
+pragma solidity ^0.5.0;
 
-import "./DappToken.sol";
+import "./Token.sol";
 import "./DaiToken.sol";
 
 contract TokenFarm {
-  string public name = "Dapp Token Farm";
-  DappToken public dappToken;
-  DaiToken public daiToken;
-  address public owner;
+    string public name = "MooreToken Farm";
+    address public owner;
+    Token public MooreToken;
+    DaiToken public daiToken;
 
-  address[] public stakers;
-  mapping(address => uint) public stakingBalance;
-  mapping(address => bool) public hasStaked;
-  mapping(address => bool) public isStaking;
+    address[] public stakers;
+    mapping(address => uint) public stakingBalance;
+    mapping(address => bool) public hasStaked;
+    mapping(address => bool) public isStaking;
 
-  constructor(DappToken _dappToken, DaiToken _daiToken) public {
-    dappToken = _dappToken;
-    daiToken = _daiToken;
-    owner = msg.sender;
-  }
-
-  modifier greaterThanZero(uint _amount) {
-    require(_amount > 0, "amount cannot be 0");
-    _;
-  }
-
-  modifier onlyOwner() {
-    require(msg.sender == owner, "caller must be owner");
-    _;
-  }
-
-  // Stake Tokens (Deposit)
-  function stakeTokens(uint _amount) public greaterThanZero(_amount) {
-    // Transfer Mock Dai tokens to contract for staking
-    daiToken.transferFrom(msg.sender, address(this), _amount);
-
-    // Update staking balance
-    stakingBalance[msg.sender] = stakingBalance[msg.sender] + _amount;
-
-    // Add user to stakers array ONLY if they haven't staked already
-    if (!hasStaked[msg.sender]) {
-      stakers.push(msg.sender);
+    constructor(Token _MooreToken, DaiToken _daiToken) public {
+       MooreToken = _MooreToken;
+        daiToken = _daiToken;
+        owner = msg.sender;
     }
 
-    // Update staking status
-    isStaking[msg.sender] = true;
-    hasStaked[msg.sender] = true;
-  }
+    function stakeTokens(uint _amount) public {
+        // Require amount greater than 0
+        require(_amount > 0, "amount cannot be 0");
 
-  // Unstaking Tokens (Withdrawal
-  function unstakeTokens() public {
-    uint balance = stakingBalance[msg.sender];
+        // Trasnfer Mock Dai tokens to this contract for staking
+        daiToken.transferFrom(msg.sender, address(this), _amount);
 
-    require(balance > 0, "staking balance cannot be 0");
+        // Update staking balance
+        stakingBalance[msg.sender] = stakingBalance[msg.sender] + _amount;
 
-    // Reset staking balance
-    stakingBalance[msg.sender] = 0;
+        // Add user to stakers array *only* if they haven't staked already
+        if(!hasStaked[msg.sender]) {
+            stakers.push(msg.sender);
+        }
 
-    // Transfer Mock Dai tokens back to investor
-    daiToken.transfer(msg.sender, balance);
-
-    //Update staking status
-    isStaking[msg.sender] = false;
-
-  }
-
-  // Issuing Tokens
-  function issueTokens() public onlyOwner {
-    for (uint i = 0; i < stakers.length; i++) {
-      address recipient = stakers[i];
-      uint balance = stakingBalance[recipient];
-      if (balance > 0) {    
-        dappToken.transfer(recipient, balance);
-      }     
+        // Update staking status
+        isStaking[msg.sender] = true;
+        hasStaked[msg.sender] = true;
     }
-  }
 
+    // Unstaking Tokens (Withdraw)
+    function unstakeTokens() public {
+        // Fetch staking balance
+        uint balance = stakingBalance[msg.sender];
+
+        // Require amount greater than 0
+        require(balance > 0, "staking balance cannot be 0");
+
+        // Transfer Mock Dai tokens to this contract for staking
+        daiToken.transfer(msg.sender, balance);
+
+        // Reset staking balance
+        stakingBalance[msg.sender] = 0;
+
+        // Update staking status
+        isStaking[msg.sender] = false;
+    }
+
+    // Issuing Tokens
+    function issueTokens() public {
+        // Only owner can call this function
+        require(msg.sender == owner, "caller must be the owner");
+
+        // Issue tokens to all stakers
+        for (uint i=0; i<stakers.length; i++) {
+            address recipient = stakers[i];
+            uint balance = stakingBalance[recipient];
+            if(balance > 0) {
+                MooreToken.transfer(recipient, balance);
+            }
+        }
+    }
 }
