@@ -9,7 +9,7 @@ const tokens = (n) => web3.utils.toWei(n, 'ether');
 // const [owner, investor] = accounts
 contract('TokenFarm', ([owner, investor]) => {
 
-  let daiToken,MOORETokenn, tokenFarm;
+  let daiToken,MOOREToken, tokenFarm;
 
   before(async () => {
      daiToken = await DaiToken.new()
@@ -54,21 +54,21 @@ contract('TokenFarm', ([owner, investor]) => {
       // Check investor balance before staking
       result = await daiToken.balanceOf(investor)
       assert.equal(result.toString(), tokens('100'), 'investor Mock Dai wallet balance correct before staking')
-   
+
       // Stake Mock DAI Tokens
-      await daiToken.approve(TokenFarm.address, tokens('100'), { from: investor }) 
+      await daiToken.approve(TokenFarm.address, tokens('100'), { from: investor })
       await tokenFarm.stakeTokens(tokens('100'), { from: investor })
 
       // Check staking result
       result = await daiToken.balanceOf(investor)
       assert.equal(result.toString(), tokens('0'), 'investor Mock DAI wallet balance correct after staking')
-     
+
       result = await daiToken.balanceOf(TokenFarm.address)
       assert.equal(result.toString(), tokens('100'), 'Token Farm balance correct after staking')
 
       result = await TokenFarm.isStaking(investor)
       assert.equal(result.toString(), 'true', 'Investor statking status correct after staking')
-   
+
       // Issue Tokens
       await tokenFarm.issueTokens({ from: owner })
 
@@ -85,13 +85,13 @@ contract('TokenFarm', ([owner, investor]) => {
       // Check result after Unstaking tokens
       result =  await daiToken.balanceOf(investor)
       assert.equal(result.toString(), tokens('100'), "investor Mock DAI wallet balance correct after unstaking")
-      
+
       result =  await daiToken.balanceOf(TokenFarm.address)
       assert.equal(result.toString(), tokens('0'), "TOken Farm Mock DAI balance correct after unstaking")
-   
+
       result = await TokenFarm.stakingBalance(investor)
       assert.equal(result.toString(), tokens('0'), "investor staking balance correct after unstaking")
-     
+
       result = await TokenFarm.isStaking(investor)
       assert.equal(result.toString(), 'false', "investor staking staus correct after unstaking")
     })
